@@ -1,7 +1,7 @@
 
 workflows:
   ios-workflow:
-    name: iOS IPA (no signing)
+    name: iOS IPA (unsigned)
 
     environment:
       flutter: stable
@@ -17,9 +17,17 @@ workflows:
           pod install
           cd ..
 
-      - name: Build unsigned IPA
+      - name: Build archive
         script: |
-          flutter build ipa --release --no-codesign
+          flutter build ios --release --no-codesign
+
+      - name: Export IPA manually
+        script: |
+          mkdir -p build/ios/ipa
+          xcodebuild -exportArchive \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath build/ios/ipa
 
     artifacts:
       - build/ios/ipa/*.ipa
